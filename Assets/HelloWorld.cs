@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// Libreria de TextMeshPro
+using TMPro;
 
 public class HelloWorld : MonoBehaviour
 {
@@ -18,7 +20,21 @@ public class HelloWorld : MonoBehaviour
 
     [SerializeField] private List<string> nombresProfesores;
 
-    // Start is called before the first frame update
+
+    [SerializeField] private ByeByeWorld elOtroScript;
+
+    public int fuerzaSalto = 1000;
+
+    public int monedas = 0;
+
+    public Rigidbody rb;
+
+    public bool saltando = false;
+
+    // Una variable para referenciar el texto
+    public TextMeshProUGUI textoMonedas;
+
+    // Ejecuta codigo al iniciar el proyecto
     void Start(){
         print("Hola Mundo!");
 
@@ -27,23 +43,59 @@ public class HelloWorld : MonoBehaviour
             nombresEstudiantes[i] = "Mauricio Muñoz " + i;  
         }
 
+        print(nombre + elOtroScript.GetApellido());
+
     }
 
-    // Update is called once per frame
+    // Es el ciclo del proyecto
     void Update()
     {
+        elOtroScript.IsIllegal(edad);
+
         print("Hola Mundo Repetido porque me dijo el Alex que era así");
-        if (edad > 50)
+        /*if (edad > 50)
         {
             print("El profe es Viejito");
         }
         else
         {
             print("el profe es taquillero");
-        }
+        }*/
 
         Movement();
+
+        // Si presiono la barra espaciadora voy a hacer que el personaje salte
+        if (Input.GetKeyDown(KeyCode.Space) && saltando == false) 
+        {
+            rb.AddForce(new Vector3(0, fuerzaSalto, 0), ForceMode.Impulse);
+            saltando = true;
+        }
     }
+
+    // Es un metodo que se ejecuta cuando apago un GameObjet
+    private void OnDisable()
+    {
+        print("Me apagué");
+    }
+    // Es un metodo que se ejecuta cuando enciendo un GameObjet
+    private void OnEnable()
+    {
+        print("Me encendí :* ");
+    }
+
+    // Metodo que se ejecuta para las físicas
+    private void FixedUpdate()
+    {
+        // USAMOS FISICAS TORQUE, FUERZA, GRAVEDAD
+    }
+
+    // Metodo que se ejecuta cuandop hay algún cambio en el Inspector
+    private void OnValidate()
+    {
+        print("Hubo un cambio en el Inspector");
+    }
+
+
     /// <summary>
     /// Este metodo hará un movimiento
     /// </summary>
@@ -73,5 +125,67 @@ public class HelloWorld : MonoBehaviour
             // MUEVO EL CUBO
             transform.Translate(0, -decimales, 0);
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        print("Colisione 2D PIXEL ART con: " + collision.gameObject.name);
+    }
+
+
+    // Valida cuando un objeto comienza a colisionar con algo
+    private void OnCollisionEnter(Collision collision)
+    {
+        print("Colisione con: " + collision.gameObject.name);
+
+        // Si mi personaje colisiona con una moneda ocurre algo
+        if (collision.gameObject.CompareTag("Moneda")) 
+        {
+            // Elimino la moneda
+            Destroy(collision.gameObject);
+
+            // Agregamos una moneda a un contador
+            monedas++;
+            textoMonedas.text = "Pelotitas" + monedas;
+
+        }
+
+        if (collision.gameObject.CompareTag("Suelo")) 
+        {
+            saltando = false;
+        }
+    }
+
+    // Validar cuando dejo de colisionar con algo
+    private void OnCollisionExit(Collision collision)
+    {
+        print("Deje de colisionar con: " + collision.gameObject.name);
+    }
+
+    // Valido si es que se mantiene una colisión
+    private void OnCollisionStay(Collision collision)
+    {
+        print("Estoy sintiendo el choque con: " + collision.gameObject.name);
+    }
+
+    // Valido si intersecté con un objeto
+    private void OnTriggerEnter(Collider other)
+    {
+        print("intersecté con: " + other.gameObject.name);
+
+    }
+
+    // Valido si dejé de intersectar con un objeto
+    private void OnTriggerExit(Collider other)
+    {
+        print("Deje de intersectar con: " + other.gameObject.name);
+
+    }
+
+    // Valido si estoy intersectando con un objeto
+    private void OnTriggerStay(Collider other)
+    {
+        print("Estoy intersectando con: " + other.gameObject.name);
+
     }
 }
